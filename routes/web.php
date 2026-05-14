@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\MahasiswaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,6 +17,8 @@ Route::middleware(['auth', 'role:admin'])
 
         Route::get('/', [DashboardController::class, 'admin'])
             ->name('dashboard');
+
+        Route::resource('mahasiswa', MahasiswaController::class);
     });
 
 //route untuk mahasiswa
