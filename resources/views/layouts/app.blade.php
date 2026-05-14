@@ -14,16 +14,50 @@
     <div class="min-h-screen flex">
 
         {{-- Sidebar --}}
-        <aside class="w-64 bg-white shadow-md">
-            <div class="p-5 border-b">
-                <h1 class="text-xl font-bold">
-                    KIP Kuliah
-                </h1>
+        <aside class="w-64 bg-white shadow-md flex flex-col justify-between">
+
+            <div>
+
+                <div class="p-5 border-b">
+                    <h1 class="text-xl font-bold">
+                        KIP Kuliah
+                    </h1>
+                </div>
+
+                <div class="p-4">
+                    @include('components.sidebar')
+                </div>
+
             </div>
 
-            <div class="p-4">
-                @include('components.sidebar')
+            <div class="p-4 border-t">
+
+                <div class="mb-3">
+
+                    <p class="font-semibold">
+                        {{ auth()->user()->name }}
+                    </p>
+
+                    <p class="text-sm text-gray-500">
+                        {{ auth()->user()->getRoleNames()->first() }}
+                    </p>
+
+                </div>
+
+                <form method="POST" action="{{ route('logout') }}">
+
+                    @csrf
+
+                    <button type="submit" class="w-full bg-red-500 text-white py-2 rounded">
+
+                        Logout
+
+                    </button>
+
+                </form>
+
             </div>
+
         </aside>
 
         {{-- Content --}}
