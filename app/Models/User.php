@@ -47,4 +47,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    //* Relasi dengan model Mahasiswa
+    public function mahasiswa()
+    {
+        return $this->hasOne(Mahasiswa::class);
+    }
+
+    //* Relasi dengan model Verifikasi (sebagai verifier)
+    public function verifikasi()
+    {
+        return $this->hasMany(Verifikasi::class, 'verifier_id');
+    }
 }
