@@ -7,23 +7,18 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function admin()
     {
-        $user = auth()->user();
+        return view('dashboard.admin.index');
+    }
 
+    public function mahasiswa()
+    {
+        return view('dashboard.mahasiswa.index');
+    }
 
-        if ($user->hasRole('admin')) {
-            return view('dashboard.admin.index');
-        }
-
-        if ($user->hasRole('mahasiswa')) {
-            return view('dashboard.mahasiswa.index');
-        }
-
-        if ($user->hasRole('verifikator')) {
-            return view('dashboard.verifikator.index');
-        }
-
-        abort(403);
+    public function verifikator()
+    {
+        return view('dashboard.verifikator.index');
     }
 }
