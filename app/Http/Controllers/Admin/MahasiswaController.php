@@ -4,62 +4,86 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Mahasiswa;
+use App\Models\User;
+use App\Http\Requests\MahasiswaStoreRequest;
+use App\Http\Requests\MahasiswaUpdateRequest;
+use App\Services\MahasiswaService;
 
 class MahasiswaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $service;
+
+    public function __construct(MahasiswaService $service)
     {
-        //
+        $this->service = $service;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index(Request $request)
+    {
+        $query = Mahasiswa::query();
+
+        if ($request->search) {
+
+            $query->where('nik', 'like', '%' . $request->search . '%')
+                ->orWhere('nisn', 'like', '%' . $request->search . '%')
+                ->orWhere('sekolah', 'like', '%' . $request->search . '%');
+        }
+
+        $mahasiswa = $query
+            ->latest()
+            ->paginate(10);
+
+        return view('dashboard.admin.mahasiswa.index', compact('mahasiswa'));
+    }
+
     public function create()
     {
-        //
+        $users = User::role('mahasiswa')->get();
+
+        return view('dashboard.admin.mahasiswa.create', compact('users'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(MahasiswaStoreRequest $request)
     {
-        //
+        $this->service->store($request->validated());
+
+        return redirect()
+            ->route('admin.mahasiswa.index')
+            ->with('success', 'Data mahasiswa berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Mahasiswa $mahasiswa)
     {
-        //
+        $users = User::role('mahasiswa')->get();
+
+        return view('dashboard.admin.mahasiswa.edit', compact(
+            'mahasiswa',
+            'users'
+        ));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+    public function update(
+        MahasiswaUpdateRequest $request,
+        Mahasiswa $mahasiswa
+    ) {
+
+        $this->service->update(
+            $mahasiswa,
+            $request->validated()
+        );
+
+        return redirect()
+            ->route('admin.mahasiswa.index')
+            ->with('success', 'Data mahasiswa berhasil diupdate');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Mahasiswa $mahasiswa)
     {
-        //
-    }
+        $this->service->delete($mahasiswa);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()
+            ->route('admin.mahasiswa.index')
+            ->with('success', 'Data mahasiswa berhasil dihapus');
     }
 }
