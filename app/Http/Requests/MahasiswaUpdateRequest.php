@@ -22,7 +22,7 @@ class MahasiswaUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('mahasiswa');
+        $id = $this->route('mahasiswa')->id;
 
         return [
 
