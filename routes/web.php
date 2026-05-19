@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\UniversitasController;
 use App\Http\Controllers\Admin\JurusanController;
 use App\Http\Controllers\Mahasiswa\PendaftaranController;
+use App\Http\Controllers\Mahasiswa\BerkasController;
+use App\Http\Controllers\Verifikator\VerifikasiBerkasController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,10 +43,17 @@ Route::middleware(['auth', 'role:mahasiswa'])
         Route::get('/', [DashboardController::class, 'mahasiswa'])
             ->name('dashboard');
 
+        //route resource untuk pendaftaran
         Route::resource('pendaftaran', PendaftaranController::class)
             ->parameters([
                 'pendaftaran' => 'pendaftaran'
             ]);
+        // route resource untuk berkas
+        Route::resource('berkas', BerkasController::class)
+            ->parameters([
+                'berkas' => 'berkas'
+            ]);
+
 
         // route untuk mengambil jurusan berdasarkan universitas
         Route::get(
@@ -61,6 +70,17 @@ Route::middleware(['auth', 'role:verifikator'])
 
         Route::get('/', [DashboardController::class, 'verifikator'])
             ->name('dashboard');
+
+        //route untuk verifikasi berkas
+        Route::get(
+            'berkas',
+            [VerifikasiBerkasController::class, 'index']
+        )->name('berkas.index');
+
+        Route::put(
+            'berkas/{berkas}/verifikasi',
+            [VerifikasiBerkasController::class, 'verifikasi']
+        )->name('berkas.verifikasi');
     });
 
 require __DIR__ . '/auth.php';
