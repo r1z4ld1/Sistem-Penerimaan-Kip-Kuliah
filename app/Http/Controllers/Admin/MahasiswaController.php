@@ -17,6 +17,17 @@ class MahasiswaController extends Controller
     public function __construct(MahasiswaService $service)
     {
         $this->service = $service;
+        $this->middleware('permission:view mahasiswa')
+            ->only('index');
+
+        $this->middleware('permission:create mahasiswa')
+            ->only(['create', 'store']);
+
+        $this->middleware('permission:edit mahasiswa')
+            ->only(['edit', 'update']);
+
+        $this->middleware('permission:delete mahasiswa')
+            ->only('destroy');
     }
 
     public function index(Request $request)

@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
 use Illuminate\Http\Request;
-
 use Spatie\Permission\Models\Role;
-
+use Spatie\Permission\Models\Permission;
 use App\Services\RoleService;
-
 use App\Http\Requests\Role\RoleStoreRequest;
 use App\Http\Requests\Role\RoleUpdateRequest;
 
@@ -103,6 +100,37 @@ class RoleController extends Controller
             ->with(
                 'success',
                 'Role berhasil dihapus'
+            );
+    }
+    public function permissions(Role $role)
+    {
+        $permissions = Permission::latest()->get();
+
+        $rolePermissions = $role
+            ->permissions
+            ->pluck('name')
+            ->toArray();
+
+        return view(
+            'dashboard.admin.roles.permissions',
+            compact(
+                'role',
+                'permissions',
+                'rolePermissions'
+            )
+        );
+    }
+    public function updatePermissions(Request $request, Role $role)
+    {
+        $role->syncPermissions(
+            $request->permissions ?? []
+        );
+
+        return redirect()
+            ->route('admin.roles.index')
+            ->with(
+                'success',
+                'Permission role berhasil diperbarui'
             );
     }
 }

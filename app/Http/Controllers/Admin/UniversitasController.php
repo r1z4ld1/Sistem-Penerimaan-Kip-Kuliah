@@ -19,6 +19,17 @@ class UniversitasController extends Controller
     public function __construct(UniversitasService $service)
     {
         $this->service = $service;
+        $this->middleware('permission:view universitas')
+            ->only('index');
+
+        $this->middleware('permission:create universitas')
+            ->only(['create', 'store']);
+
+        $this->middleware('permission:edit universitas')
+            ->only(['edit', 'update']);
+
+        $this->middleware('permission:delete universitas')
+            ->only('destroy');
     }
 
     public function index(Request $request)

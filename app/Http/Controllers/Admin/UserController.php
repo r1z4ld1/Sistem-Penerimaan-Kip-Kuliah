@@ -3,13 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-
 use App\Services\UserService;
-
 use App\Http\Controllers\Controller;
-
 use Spatie\Permission\Models\Role;
-
 use Illuminate\Http\Request;
 
 use App\Http\Requests\User\UserStoreRequest;
@@ -19,10 +15,21 @@ class UserController extends Controller
 {
     protected $service;
 
-    public function __construct(
-        UserService $service
-    ) {
+    public function __construct(UserService $service)
+    {
         $this->service = $service;
+
+        $this->middleware('permission:view user')
+            ->only('index');
+
+        $this->middleware('permission:create user')
+            ->only(['create', 'store']);
+
+        $this->middleware('permission:edit user')
+            ->only(['edit', 'update']);
+
+        $this->middleware('permission:delete user')
+            ->only('destroy');
     }
 
     public function index(Request $request)

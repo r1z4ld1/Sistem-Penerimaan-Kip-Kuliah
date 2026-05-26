@@ -21,6 +21,17 @@ class JurusanController extends Controller
     public function __construct(JurusanService $service)
     {
         $this->service = $service;
+        $this->middleware('permission:view jurusan')
+            ->only('index');
+
+        $this->middleware('permission:create jurusan')
+            ->only(['create', 'store']);
+
+        $this->middleware('permission:edit jurusan')
+            ->only(['edit', 'update']);
+
+        $this->middleware('permission:delete jurusan')
+            ->only('destroy');
     }
 
     public function index(Request $request)
