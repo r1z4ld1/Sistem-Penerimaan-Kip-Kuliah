@@ -9,12 +9,15 @@ use App\Http\Controllers\Admin\JurusanController;
 use App\Http\Controllers\Mahasiswa\PendaftaranController;
 use App\Http\Controllers\Mahasiswa\BerkasController;
 use App\Http\Controllers\Verifikator\VerifikasiBerkasController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\PermissionController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-//route untuk role admin
+//route group untuk role admin
 Route::middleware(['auth', 'role:admin'])
     ->prefix('dashboard/admin')
     ->name('admin.')
@@ -23,18 +26,49 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/', [DashboardController::class, 'admin'])
             ->name('dashboard');
 
+        // route management user
+        Route::resource(
+            'users',
+            UserController::class
+        );
+        // route management role
+        Route::resource(
+            'roles',
+            RoleController::class
+        );
+
+        // role management permission
+        Route::resource(
+            'permissions',
+            PermissionController::class
+        );
+        Route::get(
+            'roles/{role}/permissions',
+            [RoleController::class, 'permissions']
+        )->name('roles.permissions');
+
+        Route::put(
+            'roles/{role}/permissions',
+            [RoleController::class, 'updatePermissions']
+        )->name('roles.permissions.update');
+
+        // route management mahasiswa
         Route::resource('mahasiswa', MahasiswaController::class);
+
+        // route management universitas
         Route::resource('universitas', UniversitasController::class)
             ->parameters([
                 'universitas' => 'universitas'
             ]);
+
+        // route management jurusan
         Route::resource('jurusan', JurusanController::class)
             ->parameters([
                 'jurusan' => 'jurusan'
             ]);
     });
 
-//route untuk role mahasiswa
+//route group untuk role mahasiswa
 Route::middleware(['auth', 'role:mahasiswa'])
     ->prefix('dashboard/mahasiswa')
     ->name('mahasiswa.')
@@ -62,7 +96,7 @@ Route::middleware(['auth', 'role:mahasiswa'])
         )->name('mahasiswa.getJurusan');
     });
 
-//route untuk role verifikator
+//route group untuk role verifikator
 Route::middleware(['auth', 'role:verifikator'])
     ->prefix('dashboard/verifikator')
     ->name('verifikator.')
