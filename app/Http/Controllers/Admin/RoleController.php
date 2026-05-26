@@ -2,52 +2,47 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-
-use App\Services\UserService;
-
 use App\Http\Controllers\Controller;
-
-use Spatie\Permission\Models\Role;
 
 use Illuminate\Http\Request;
 
-use App\Http\Requests\User\UserStoreRequest;
-use App\Http\Requests\User\UserUpdateRequest;
+use Spatie\Permission\Models\Role;
 
-class UserController extends Controller
+use App\Services\RoleService;
+
+use App\Http\Requests\Role\RoleStoreRequest;
+use App\Http\Requests\Role\RoleUpdateRequest;
+
+class RoleController extends Controller
 {
     protected $service;
 
     public function __construct(
-        UserService $service
+        RoleService $service
     ) {
         $this->service = $service;
     }
 
     public function index(Request $request)
     {
-        $users = $this->service
+        $roles = $this->service
             ->getAll($request->search);
 
         return view(
-            'dashboard.admin.users.index',
-            compact('users')
+            'dashboard.admin.roles.index',
+            compact('roles')
         );
     }
 
     public function create()
     {
-        $roles = Role::all();
-
         return view(
-            'dashboard.admin.users.create',
-            compact('roles')
+            'dashboard.admin.roles.create'
         );
     }
 
     public function store(
-        UserStoreRequest $request
+        RoleStoreRequest $request
     ) {
 
         $this->service->store(
@@ -55,45 +50,43 @@ class UserController extends Controller
         );
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('admin.roles.index')
             ->with(
                 'success',
-                'User berhasil ditambahkan'
+                'Role berhasil ditambahkan'
             );
     }
 
-    public function edit(User $user)
+    public function edit(Role $role)
     {
-        $roles = Role::all();
-
         return view(
-            'dashboard.admin.users.edit',
-            compact('user', 'roles')
+            'dashboard.admin.roles.edit',
+            compact('role')
         );
     }
 
     public function update(
-        UserUpdateRequest $request,
-        User $user
+        RoleUpdateRequest $request,
+        Role $role
     ) {
 
         $this->service->update(
-            $user,
+            $role,
             $request->validated()
         );
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('admin.roles.index')
             ->with(
                 'success',
-                'User berhasil diupdate'
+                'Role berhasil diupdate'
             );
     }
 
-    public function destroy(User $user)
+    public function destroy(Role $role)
     {
         $deleted = $this->service
-            ->delete($user);
+            ->delete($role);
 
         if (!$deleted) {
 
@@ -101,15 +94,15 @@ class UserController extends Controller
                 ->back()
                 ->with(
                     'error',
-                    'Anda tidak bisa menghapus akun sendiri'
+                    'Role system tidak bisa dihapus'
                 );
         }
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('admin.roles.index')
             ->with(
                 'success',
-                'User berhasil dihapus'
+                'Role berhasil dihapus'
             );
     }
 }
