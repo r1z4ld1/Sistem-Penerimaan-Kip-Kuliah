@@ -13,6 +13,18 @@ enum PermissionEnum: string
     case EDIT_MAHASISWA = 'edit mahasiswa';
     case DELETE_MAHASISWA = 'delete mahasiswa';
 
+        // Universitas
+    case VIEW_UNIVERSITAS = 'view universitas';
+    case CREATE_UNIVERSITAS = 'create universitas';
+    case EDIT_UNIVERSITAS = 'edit universitas';
+    case DELETE_UNIVERSITAS = 'delete universitas';
+
+        // Jurusan
+    case VIEW_JURUSAN = 'view jurusan';
+    case CREATE_JURUSAN = 'create jurusan';
+    case EDIT_JURUSAN = 'edit jurusan';
+    case DELETE_JURUSAN = 'delete jurusan';
+
         // Pendaftaran
     case VIEW_PENDAFTARAN = 'view pendaftaran';
     case CREATE_PENDAFTARAN = 'create pendaftaran';

@@ -9,6 +9,9 @@ use Spatie\Permission\Models\Permission;
 use App\Services\RoleService;
 use App\Http\Requests\Role\RoleStoreRequest;
 use App\Http\Requests\Role\RoleUpdateRequest;
+use App\Helpers\PermissionHelper;
+use App\Enums\RoleEnum;
+
 
 class RoleController extends Controller
 {
@@ -104,8 +107,14 @@ class RoleController extends Controller
     }
     public function permissions(Role $role)
     {
-        $permissions = Permission::latest()->get();
+        $allowedPermissions = PermissionHelper::getPermissionsByRole(
+            $role->name
+        );
 
+        $permissions = Permission::whereIn(
+            'name',
+            $allowedPermissions
+        )->get();
         $rolePermissions = $role
             ->permissions
             ->pluck('name')
@@ -120,14 +129,31 @@ class RoleController extends Controller
             )
         );
     }
-    public function updatePermissions(Request $request, Role $role)
-    {
-        $role->syncPermissions(
-            $request->permissions ?? []
+    public function updatePermissions(
+        Request $request,
+        Role $role
+    ) {
+
+        $allowedPermissions = PermissionHelper::getPermissionsByRole(
+            $role->name
         );
 
+        $permissions = collect(
+            $request->permissions ?? []
+        )
+            ->filter(function ($permission) use ($allowedPermissions) {
+
+                return in_array(
+                    $permission,
+                    $allowedPermissions
+                );
+            })
+            ->toArray();
+
+        $role->syncPermissions($permissions);
+
         return redirect()
-            ->route('admin.roles.index')
+            ->back()
             ->with(
                 'success',
                 'Permission role berhasil diperbarui'
