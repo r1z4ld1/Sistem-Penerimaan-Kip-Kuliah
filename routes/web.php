@@ -115,6 +115,12 @@ Route::middleware(['auth', 'role:verifikator'])
             'berkas/{berkas}/verifikasi',
             [VerifikasiBerkasController::class, 'verifikasi']
         )->name('berkas.verifikasi');
+
+        //route untuk lihat detail mahasiswa
+        Route::get(
+            'mahasiswa',
+            [\App\Http\Controllers\Verifikator\MahasiswaController::class, 'index']
+        )->name('mahasiswa.index');
     });
 
 require __DIR__ . '/auth.php';
