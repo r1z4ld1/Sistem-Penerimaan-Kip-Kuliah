@@ -3,6 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Berkas;
+use App\Models\Mahasiswa;
+use App\Models\Universitas;
+use App\Models\Jurusan;
+use App\Models\Verifikasi;
 
 class Pendaftaran extends Model
 {
