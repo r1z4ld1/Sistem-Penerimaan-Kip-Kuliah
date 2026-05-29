@@ -8,15 +8,19 @@ use App\Models\Pendaftaran;
 use App\Enums\StatusPendaftaranEnum;
 use App\Models\Berkas;
 use App\Repositories\MahasiswaRepository;
-use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
+use App\Enums\NotificationTypeEnum;
+use App\Enums\StatusBerkasEnum;
 
 class VerifikatorService
 {
     private $mahasiswaRepository;
+    protected NotificationService $notificationService;
 
-    public function __construct(MahasiswaRepository $mahasiswaRepository)
+    public function __construct(MahasiswaRepository $mahasiswaRepository, NotificationService $notificationService)
     {
         $this->mahasiswaRepository = $mahasiswaRepository;
+        $this->notificationService = $notificationService;
     }
 
     public function getMahasiswaVerifikasi(
@@ -148,8 +152,10 @@ class VerifikatorService
             'status' => 'pending'
         ]);
     }
-    public function updateVerifikasi($berkas, array $data)
-    {
+    public function updateVerifikasi(
+        $berkas,
+        array $data
+    ) {
         $berkas->update([
 
             'status_verifikasi'
@@ -159,19 +165,84 @@ class VerifikatorService
             => $data['catatan_verifikasi'],
 
             'verified_by'
-            => $data['verified_by'],
+            => $data['verified_by'] ?? null,
 
             'verified_at'
-            => $data['verified_at'],
+            => $data['verified_at'] ?? null,
         ]);
+
+        $this->updateStatusPendaftaran(
+            $berkas->fresh()
+        );
+
+        $this->sendNotification(
+            $berkas->fresh()
+        );
+    }
+
+    private function sendNotification($berkas)
+    {
+        $user = $berkas
+            ->pendaftaran
+            ->mahasiswa
+            ->user;
+
+        if (!$user) {
+            return;
+        }
 
         /*
     |--------------------------------------------------------------------------
-    | sinkron status pendaftaran
+    | DITERIMA
     |--------------------------------------------------------------------------
     */
-        $this->updateStatusPendaftaran($berkas);
+        if (
+            $berkas->status_verifikasi
+            === StatusBerkasEnum::DITERIMA
+        ) {
+
+            $this->notificationService
+                ->create(
+
+                    $user,
+
+                    'Berkas Diterima',
+
+                    'Berkas '
+                        . $berkas->nama_berkas .
+                        ' telah diterima oleh verifikator.',
+
+                    NotificationTypeEnum::SUCCESS
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | DITOLAK
+    |--------------------------------------------------------------------------
+    */
+        if (
+            $berkas->status_verifikasi
+            === StatusBerkasEnum::DITOLAK
+        ) {
+
+            $this->notificationService
+                ->create(
+
+                    $user,
+
+                    'Berkas Ditolak',
+
+                    'Berkas '
+                        . $berkas->nama_berkas .
+                        ' ditolak. Alasan: '
+                        . ($berkas->catatan_verifikasi ?? '-'),
+
+                    NotificationTypeEnum::ERROR
+                );
+        }
     }
+
     public function getVerificationSummary(): array
     {
         return $this->mahasiswaRepository
