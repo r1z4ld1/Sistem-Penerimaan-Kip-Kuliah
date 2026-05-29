@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Mahasiswa;
 use App\Models\Verifikasi;
+use App\Models\Notification;
 
 class User extends Authenticatable
 {
@@ -60,5 +61,13 @@ class User extends Authenticatable
     public function verifikasi()
     {
         return $this->hasMany(Verifikasi::class, 'verifier_id');
+    }
+
+    //* Relasi dengan model Notification
+    public function notifications()
+    {
+        return $this->hasMany(
+            \App\Models\Notification::class
+        );
     }
 }
