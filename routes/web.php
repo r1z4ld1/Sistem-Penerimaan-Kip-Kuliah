@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+//use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\MahasiswaController;
@@ -8,14 +8,27 @@ use App\Http\Controllers\Admin\UniversitasController;
 use App\Http\Controllers\Admin\JurusanController;
 use App\Http\Controllers\Mahasiswa\PendaftaranController;
 use App\Http\Controllers\Mahasiswa\BerkasController;
+use App\Http\Controllers\Mahasiswa\ProfileController;
 use App\Http\Controllers\Verifikator\VerifikasiBerkasController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+//route untuk melihat notifikasi
+Route::get(
+    '/notifications',
+    [NotificationController::class, 'index']
+)->name('notifications.index');
+
+Route::get(
+    '/notifications/latest',
+    [NotificationController::class, 'latest']
+)->name('notifications.latest');
 
 //route group untuk role admin
 Route::middleware(['auth', 'role:admin'])
@@ -77,6 +90,22 @@ Route::middleware(['auth', 'role:mahasiswa'])
         Route::get('/', [DashboardController::class, 'mahasiswa'])
             ->name('dashboard');
 
+        //route untuk melihat profil mahasiswa
+        Route::get(
+            '/profile',
+            [ProfileController::class, 'index']
+        )->name('profile.index');
+
+        Route::post(
+            '/profile',
+            [ProfileController::class, 'store']
+        )->name('profile.store');
+
+        Route::put(
+            '/profile/{mahasiswa}',
+            [ProfileController::class, 'update']
+        )->name('profile.update');
+
         //route resource untuk pendaftaran
         Route::resource('pendaftaran', PendaftaranController::class)
             ->parameters([
@@ -121,6 +150,16 @@ Route::middleware(['auth', 'role:verifikator'])
             'mahasiswa',
             [\App\Http\Controllers\Verifikator\MahasiswaController::class, 'index']
         )->name('mahasiswa.index');
+
+        //route untuk lihat detail pendafatran mahasiswa
+        Route::get(
+            '/berkas/{mahasiswa}',
+            [VerifikasiBerkasController::class, 'show']
+        )->name('berkas.show');
+        Route::put(
+            '/berkas/{berkas}',
+            [VerifikasiBerkasController::class, 'update']
+        )->name('berkas.update');
     });
 
 require __DIR__ . '/auth.php';
