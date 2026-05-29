@@ -29,7 +29,7 @@ enum PermissionEnum: string
     case VIEW_PENDAFTARAN = 'view pendaftaran';
     case CREATE_PENDAFTARAN = 'create pendaftaran';
     case EDIT_PENDAFTARAN = 'edit pendaftaran';
-    case DELETE_PENDAFTARAN = 'delete pendaftaran';
+        //case DELETE_PENDAFTARAN = 'delete pendaftaran';
 
         // Berkas
     case VIEW_BERKAS = 'view berkas';
