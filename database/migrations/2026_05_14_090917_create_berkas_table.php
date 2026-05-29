@@ -18,15 +18,16 @@ return new class extends Migration
                 ->constrained('pendaftaran')
                 ->onDelete('cascade');
 
-            $table->string('jenis_berkas');
 
-            $table->string('nama_file');
+            $table->string('nama_berkas');
+            $table->string('file_berkas');
 
-            $table->enum('status_berkas', [
+            $table->enum('status_verifikasi', [
                 'pending',
-                'valid',
-                'revisi'
+                'diterima',
+                'ditolak'
             ])->default('pending');
+            $table->text('catatan_verifikasi')->nullable();
 
             $table->timestamps();
         });
