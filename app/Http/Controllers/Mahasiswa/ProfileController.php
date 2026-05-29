@@ -44,7 +44,7 @@ class ProfileController extends Controller
         $this->service->store($data);
 
         return redirect()
-            ->route('mahasiswa.profile.index')
+            ->route('mahasiswa.dashboard')
             ->with(
                 'success',
                 'Biodata berhasil dilengkapi'
@@ -66,7 +66,7 @@ class ProfileController extends Controller
         );
 
         return redirect()
-            ->route('mahasiswa.profile.index')
+            ->route('mahasiswa.dashboard')
             ->with(
                 'success',
                 'Biodata berhasil diupdate'

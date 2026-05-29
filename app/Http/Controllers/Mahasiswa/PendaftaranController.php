@@ -6,7 +6,6 @@ use App\Models\Jurusan;
 use App\Models\Pendaftaran;
 use App\Models\Universitas;
 use App\Services\PendaftaranService;
-
 use App\Http\Controllers\Controller;
 
 use App\Http\Requests\PendaftaranStoreRequest;
@@ -90,8 +89,6 @@ class PendaftaranController extends Controller
             'kode_pendaftaran' => 'KIP-' . time(),
 
             'tanggal_daftar' => now(),
-
-            'status' => 'pending',
         ];
 
         $this->service->store($data);
