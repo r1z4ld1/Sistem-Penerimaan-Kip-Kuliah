@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Mahasiswa;
 use App\Repositories\MahasiswaRepository;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class MahasiswaService
 {
@@ -15,9 +16,10 @@ class MahasiswaService
         $this->repository = $repository;
     }
 
-    public function getAll()
-    {
-        return $this->repository->getAll();
+    public function getAll(
+        ?string $search = null
+    ) {
+        return $this->repository->getAll($search);
     }
 
     public function store(array $data)
@@ -53,5 +55,11 @@ class MahasiswaService
         }
 
         return $this->repository->delete($mahasiswa);
+    }
+    public function storeProfile(array $data)
+    {
+        $data['user_id'] = Auth::id();
+
+        return Mahasiswa::create($data);
     }
 }
