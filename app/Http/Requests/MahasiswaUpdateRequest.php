@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MahasiswaUpdateRequest extends FormRequest
 {
@@ -22,14 +23,23 @@ class MahasiswaUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('mahasiswa')->id;
+        $mahasiswa = $this->route('mahasiswa');
 
         return [
+            'nama' => 'required',
 
-            'user_id' => 'required|exists:users,id',
+            'nik' => [
+                'required',
+                'digits:16',
+                Rule::unique('mahasiswa', 'nik')
+                    ->ignore($mahasiswa->id),
+            ],
 
-            'nik' => 'required|unique:mahasiswa,nik,' . $id,
-            'nisn' => 'required|unique:mahasiswa,nisn,' . $id,
+            'nisn' => [
+                'required',
+                Rule::unique('mahasiswa', 'nisn')
+                    ->ignore($mahasiswa->id),
+            ],
 
             'tempat_lahir' => 'required',
 
@@ -46,6 +56,14 @@ class MahasiswaUpdateRequest extends FormRequest
             'tahun_lulus' => 'required',
 
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.digits' => 'NIK harus terdiri dari tepat 16 digit angka.',
+            'nik.unique' => 'NIK sudah terdaftar.',
         ];
     }
 }

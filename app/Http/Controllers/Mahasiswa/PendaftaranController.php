@@ -22,14 +22,20 @@ class PendaftaranController extends Controller
     public function index()
     {
         $mahasiswa = auth()->user()->mahasiswa;
+        if (!$mahasiswa) {
 
-        $pendaftaran = Pendaftaran::with([
-            'universitas',
-            'jurusan'
-        ])
-            ->where('mahasiswa_id', $mahasiswa->id)
-            ->latest()
-            ->get();
+            return redirect()
+                ->route('mahasiswa.dashboard')
+                ->with(
+                    'error',
+                    'Silakan lengkapi biodata terlebih dahulu sebelum membuat pendaftaran KIP Kuliah.'
+                );
+        }
+
+        $pendaftaran = $this->service
+            ->getByMahasiswa(
+                $mahasiswa->id
+            );
 
         return view(
             'dashboard.mahasiswa.pendaftaran.index',
@@ -41,17 +47,52 @@ class PendaftaranController extends Controller
     {
         $mahasiswa = auth()->user()->mahasiswa;
 
-        // batasi 1 pendaftaran
-        $cek = Pendaftaran::where(
+        $pendaftaran = Pendaftaran::where(
             'mahasiswa_id',
             $mahasiswa->id
-        )->exists();
+        )
+            ->latest()
+            ->first();
 
-        if ($cek) {
+        // batasi 1 pendaftaran
+        $cek = $this->service
+            ->existsByMahasiswa(
+                $mahasiswa->id
+            );
 
-            return redirect()
-                ->route('mahasiswa.pendaftaran.index')
-                ->with('error', 'Anda sudah memiliki pendaftaran');
+        if ($pendaftaran) {
+
+            /*
+        |--------------------------------------------------------------------------
+        | masih pending
+        |--------------------------------------------------------------------------
+        */
+
+            if ($pendaftaran->status === 'pending') {
+
+                return redirect()
+                    ->route('mahasiswa.pendaftaran.index')
+                    ->with(
+                        'error',
+                        'Pendaftaran Anda masih menunggu verifikasi.'
+                    );
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | sudah diterima
+        |--------------------------------------------------------------------------
+        */
+
+            if ($pendaftaran->status === 'diterima') {
+
+                return redirect()
+                    ->route('mahasiswa.berkas.index')
+                    ->with(
+                        'success',
+                        'Pendaftaran telah diterima. Silakan upload berkas.'
+                    );
+            }
         }
 
         $universitas = Universitas::all();
@@ -60,7 +101,10 @@ class PendaftaranController extends Controller
 
         return view(
             'dashboard.mahasiswa.pendaftaran.create',
-            compact('universitas', 'jurusan')
+            compact(
+                'universitas',
+                'jurusan'
+            )
         );
     }
 

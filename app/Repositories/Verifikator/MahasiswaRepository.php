@@ -12,7 +12,7 @@ class MahasiswaRepository
 
             ->when($search, function ($query) use ($search) {
 
-                $query->where('nama_lengkap', 'like', "%{$search}%")
+                $query->where('nama', 'like', "%{$search}%")
                     ->orWhere('nik', 'like', "%{$search}%")
                     ->orWhere('nisn', 'like', "%{$search}%");
             })

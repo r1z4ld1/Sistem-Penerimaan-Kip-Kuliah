@@ -22,6 +22,7 @@ class ProfileController extends Controller
 
     public function index()
     {
+
         $mahasiswa = Mahasiswa::where(
             'user_id',
             Auth::id()

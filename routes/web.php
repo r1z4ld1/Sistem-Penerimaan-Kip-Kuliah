@@ -1,7 +1,7 @@
 <?php
 
-//use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\UniversitasController;
@@ -10,14 +10,22 @@ use App\Http\Controllers\Mahasiswa\PendaftaranController;
 use App\Http\Controllers\Mahasiswa\BerkasController;
 use App\Http\Controllers\Mahasiswa\ProfileController;
 use App\Http\Controllers\Verifikator\VerifikasiBerkasController;
+use App\Http\Controllers\Verifikator\VerifikasiPendaftaranController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::redirect('/', '/login');
+
+Route::get('/login', [AuthController::class, 'index'])
+    ->name('login');
+
+Route::post('/login', [AuthController::class, 'authenticate'])
+    ->name('login.authenticate');
 
 //route untuk melihat notifikasi
 Route::get(
@@ -134,6 +142,23 @@ Route::middleware(['auth', 'role:verifikator'])
         Route::get('/', [DashboardController::class, 'verifikator'])
             ->name('dashboard');
 
+        //route untuk verifikasi pendaftaran
+
+        Route::get(
+            'pendaftaran',
+            [VerifikasiPendaftaranController::class, 'index']
+        )->name('pendaftaran.index');
+
+        Route::get(
+            'pendaftaran/{pendaftaran}',
+            [VerifikasiPendaftaranController::class, 'show']
+        )->name('pendaftaran.show');
+
+        Route::put(
+            'pendaftaran/{pendaftaran}',
+            [VerifikasiPendaftaranController::class, 'update']
+        )->name('pendaftaran.update');
+
         //route untuk verifikasi berkas
         Route::get(
             'berkas',
@@ -162,4 +187,10 @@ Route::middleware(['auth', 'role:verifikator'])
         )->name('berkas.update');
     });
 
+//route untuk login dan register
+Route::get('login', [AuthenticatedSessionController::class, 'create'])
+    ->name('login');
+
+Route::get('register', [RegisteredUserController::class, 'create'])
+    ->name('register');
 require __DIR__ . '/auth.php';

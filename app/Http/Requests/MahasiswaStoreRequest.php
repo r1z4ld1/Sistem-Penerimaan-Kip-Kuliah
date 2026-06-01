@@ -24,9 +24,9 @@ class MahasiswaStoreRequest extends FormRequest
     {
         return [
 
-            'user_id' => 'required|exists:users,id',
-
-            'nik' => 'required|unique:mahasiswa,nik',
+            //'user_id' => 'required|exists:users,id',
+            'nama' => 'required',
+            'nik' => 'required|digits:16|unique:mahasiswa,nik,' . $this->mahasiswa,
             'nisn' => 'required|unique:mahasiswa,nisn',
 
             'tempat_lahir' => 'required',
@@ -43,6 +43,14 @@ class MahasiswaStoreRequest extends FormRequest
             'tahun_lulus' => 'required',
 
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.digits' => 'NIK harus terdiri dari tepat 16 digit angka.',
+            'nik.unique' => 'NIK sudah terdaftar.',
         ];
     }
 }

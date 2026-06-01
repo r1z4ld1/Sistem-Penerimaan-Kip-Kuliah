@@ -7,7 +7,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>Sistem Penerimaan KIP Kuliah - {{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -36,12 +39,8 @@
                 {{-- App Brand / Logo --}}
                 <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 14l9-5-9-5-9 5 9 5z" />
-                            </svg>
+                        <div>
+                            <img src="{{ asset('favicon.svg') }}" alt="Logo" class="w-8 h-8">
                         </div>
                         <h1
                             class="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-500">

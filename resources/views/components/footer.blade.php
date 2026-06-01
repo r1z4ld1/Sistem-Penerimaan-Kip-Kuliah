@@ -5,7 +5,7 @@
         {{-- Hak Cipta --}}
         <span class="text-xs sm:text-sm font-medium text-slate-500 tracking-tight">
             © {{ date('Y') }} <span class="font-bold text-slate-700 bg-clip-text">Sistem Penerimaan KIP
-                Kuliah</span>. All rights reserved.
+                Kuliah</span>. All rights reserved &mdash; Designed by | r1z4ld1 👨‍💻
         </span>
 
         {{-- Badge Versi --}}

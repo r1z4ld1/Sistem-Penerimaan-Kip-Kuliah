@@ -7,12 +7,58 @@ use Illuminate\Http\Request;
 use App\Models\Mahasiswa;
 use App\Models\Pendaftaran;
 use App\Services\VerifikatorService;
+use App\Models\Berkas;
+use App\Models\Universitas;
+use App\Models\User;
+use App\Enums\StatusBerkasEnum;
+use App\Models\Jurusan;
 
 class DashboardController extends Controller
 {
+
+    public function index()
+    {
+        $totalMahasiswa = Mahasiswa::count();
+
+        $totalUser = User::count();
+
+        $totalUniversitas = Universitas::count();
+
+        $totalJurusan = Jurusan::count();
+
+
+        return view(
+            'dashboard.admin.index',
+            compact(
+                'totalMahasiswa',
+                'totalUser',
+                'totalUniversitas',
+                'totalJurusan'
+
+            )
+        );
+    }
+
     public function admin()
     {
-        return view('dashboard.admin.index');
+        $totalMahasiswa = Mahasiswa::count();
+
+        $totalUser = User::count();
+
+        $totalUniversitas = Universitas::count();
+
+        $totalJurusan = Jurusan::count();
+
+        return view(
+            'dashboard.admin.index',
+            compact(
+                'totalMahasiswa',
+                'totalUser',
+                'totalUniversitas',
+                'totalJurusan'
+
+            )
+        );
     }
 
     public function mahasiswa()
@@ -100,16 +146,63 @@ class DashboardController extends Controller
         }
 
         $progress = 0;
+        $progressLabel = 'Belum Mengisi Biodata';
 
-        if ($totalBerkas > 0) {
+        if ($mahasiswa) {
 
-            $progress = round(
-                (
-                    ($diterima + $ditolak)
-                    /
-                    $totalBerkas
-                ) * 100
-            );
+            $progressLabel =
+                'Biodata Lengkap';
+        }
+
+        if ($pendaftaran) {
+
+            $progressLabel =
+                'Pendaftaran Diajukan';
+        }
+
+        if (
+            $pendaftaran &&
+            $pendaftaran->status === 'diterima'
+        ) {
+
+            $progressLabel =
+                'Pendaftaran Disetujui';
+        }
+
+        if (
+            $progress === 100
+        ) {
+
+            $progressLabel =
+                'Seluruh Berkas Diverifikasi';
+        }
+
+        if ($mahasiswa) {
+
+            $progress = 25;
+        }
+
+        if ($pendaftaran) {
+
+            $progress = 50;
+        }
+
+        if (
+            $pendaftaran &&
+            $pendaftaran->status === 'diterima'
+        ) {
+
+            $progress = 75;
+        }
+
+        if (
+            $pendaftaran &&
+            $pendaftaran->status === 'diterima' &&
+            $totalBerkas > 0 &&
+            $pending === 0
+        ) {
+
+            $progress = 100;
         }
 
         return view(
@@ -122,7 +215,9 @@ class DashboardController extends Controller
                 'pending',
                 'diterima',
                 'ditolak',
-                'progress'
+                'progress',
+                'progressLabel',
+                //'bolehUploadBerkas'
             )
         );
     }

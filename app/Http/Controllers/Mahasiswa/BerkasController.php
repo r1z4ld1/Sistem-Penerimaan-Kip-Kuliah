@@ -12,6 +12,7 @@ use App\Services\BerkasService;
 use App\Http\Controllers\Controller;
 
 use App\Http\Requests\BerkasStoreRequest;
+use App\Http\Requests\BerkasUpdateRequest;
 
 class BerkasController extends Controller
 {
@@ -25,6 +26,41 @@ class BerkasController extends Controller
     public function index()
     {
         $mahasiswa = auth()->user()->mahasiswa;
+
+        if (!$mahasiswa) {
+
+            return redirect()
+                ->route('mahasiswa.dashboard')
+                ->with(
+                    'error',
+                    'Silakan lengkapi biodata terlebih dahulu sebelum upload berkas.'
+                );
+        }
+
+        $pendaftaran = Pendaftaran::where(
+            'mahasiswa_id',
+            $mahasiswa->id
+        )->latest()->first();
+
+        if (!$pendaftaran) {
+
+            return redirect()
+                ->route('mahasiswa.pendaftaran.index')
+                ->with(
+                    'error',
+                    'Silakan ajukan pendaftaran terlebih dahulu.'
+                );
+        }
+
+        if ($pendaftaran->status !== 'diterima') {
+
+            return redirect()
+                ->route('mahasiswa.pendaftaran.index')
+                ->with(
+                    'error',
+                    'Pendaftaran Anda belum disetujui verifikator.'
+                );
+        }
 
         $berkas = Berkas::whereHas(
             'pendaftaran',
@@ -52,7 +88,27 @@ class BerkasController extends Controller
         $pendaftaran = Pendaftaran::where(
             'mahasiswa_id',
             $mahasiswa->id
-        )->get();
+        )->latest()->first();
+
+        if (!$pendaftaran) {
+
+            return redirect()
+                ->route('mahasiswa.pendaftaran.index')
+                ->with(
+                    'error',
+                    'Silakan ajukan pendaftaran terlebih dahulu.'
+                );
+        }
+
+        if ($pendaftaran->status !== 'diterima') {
+
+            return redirect()
+                ->route('mahasiswa.pendaftaran.index')
+                ->with(
+                    'error',
+                    'Pendaftaran Anda belum disetujui verifikator.'
+                );
+        }
 
         return view(
             'dashboard.mahasiswa.berkas.create',
@@ -62,6 +118,29 @@ class BerkasController extends Controller
 
     public function store(BerkasStoreRequest $request)
     {
+
+        $mahasiswa = auth()->user()->mahasiswa;
+
+        $pendaftaran = Pendaftaran::findOrFail(
+            $request->pendaftaran_id
+        );
+
+        if (
+            $pendaftaran->mahasiswa_id !== $mahasiswa->id
+        ) {
+
+            abort(403);
+        }
+
+        if ($pendaftaran->status !== 'diterima') {
+
+            return redirect()
+                ->route('mahasiswa.pendaftaran.index')
+                ->with(
+                    'error',
+                    'Pendaftaran belum disetujui verifikator.'
+                );
+        }
         $file = $request->file('file_berkas');
 
         $path = $file->store(
@@ -104,7 +183,10 @@ class BerkasController extends Controller
     }
     public function edit(Berkas $berkas)
     {
+
+
         $this->authorizeBerkas($berkas);
+
         $this->ensureEditable($berkas);
 
         return view(
@@ -114,10 +196,12 @@ class BerkasController extends Controller
     }
 
     public function update(
-        BerkasStoreRequest $request,
+        BerkasUpdateRequest $request,
         Berkas $berkas
 
     ) {
+        //test debug
+        //dd('UPDATE TERPANGGIL');
         $this->authorizeBerkas($berkas);
         $this->ensureEditable($berkas);
         if ($request->hasFile('file_berkas')) {

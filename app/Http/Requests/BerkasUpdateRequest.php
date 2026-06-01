@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserStoreRequest extends FormRequest
+class BerkasUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,15 +23,7 @@ class UserStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-
-            'name' => 'required|string|max:255',
-
-            'email' => 'required|email|unique:users,email',
-
-            'password' => 'required|min:6',
-
-            'role' => 'required'
-
+            'file_berkas' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
         ];
     }
 }

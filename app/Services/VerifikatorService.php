@@ -12,6 +12,7 @@ use App\Services\NotificationService;
 use App\Enums\NotificationTypeEnum;
 use App\Enums\StatusBerkasEnum;
 
+
 class VerifikatorService
 {
     private $mahasiswaRepository;
@@ -61,7 +62,7 @@ class VerifikatorService
                 function ($item) use ($status) {
 
                     return $this
-                        ->getStatusMahasiswa($item)
+                        ->getStatusBerkasMahasiswa($item)
                         === $status;
                 }
             );
@@ -82,14 +83,15 @@ class VerifikatorService
         );
     }
 
-    private function updateStatusPendaftaran($berkas)
+    //baris kode fungsi sementara, dan ini belum dipanggil di controller manapun, karena masih dalam tahap pengembangan
+    /*private function updateStatusPendaftaran($berkas)
     {
         /*
     |--------------------------------------------------------------------------
     | ambil pendaftaran
     |--------------------------------------------------------------------------
     */
-        $pendaftaran = $berkas->pendaftaran;
+    /*$pendaftaran = $berkas->pendaftaran;
 
         if (!$pendaftaran) {
             return;
@@ -100,14 +102,14 @@ class VerifikatorService
     | ambil semua berkas
     |--------------------------------------------------------------------------
     */
-        $allBerkas = $pendaftaran->berkas;
+    /* $allBerkas = $pendaftaran->berkas;
 
         /*
     |--------------------------------------------------------------------------
     | cek apakah ada ditolak
     |--------------------------------------------------------------------------
     */
-        $hasRejected = $allBerkas->contains(function ($item) {
+    /*$hasRejected = $allBerkas->contains(function ($item) {
 
             return $item->status_verifikasi?->value == 'ditolak';
         });
@@ -126,7 +128,7 @@ class VerifikatorService
     | cek apakah semua diterima
     |--------------------------------------------------------------------------
     */
-        $allAccepted =
+    /*$allAccepted =
             $allBerkas->count() > 0
             &&
             $allBerkas->every(function ($item) {
@@ -148,10 +150,11 @@ class VerifikatorService
     | default pending
     |--------------------------------------------------------------------------
     */
-        $pendaftaran->update([
+    /*$pendaftaran->update([
             'status' => 'pending'
         ]);
-    }
+    }*/
+
     public function updateVerifikasi(
         $berkas,
         array $data
@@ -170,10 +173,6 @@ class VerifikatorService
             'verified_at'
             => $data['verified_at'] ?? null,
         ]);
-
-        $this->updateStatusPendaftaran(
-            $berkas->fresh()
-        );
 
         $this->sendNotification(
             $berkas->fresh()
@@ -245,8 +244,31 @@ class VerifikatorService
 
     public function getVerificationSummary(): array
     {
-        return $this->mahasiswaRepository
-            ->getVerificationSummary();
+        $mahasiswa = $this->mahasiswaRepository
+            ->getMahasiswaDenganBerkas();
+
+        $pending = 0;
+        $diterima = 0;
+        $ditolak = 0;
+
+        foreach ($mahasiswa as $item) {
+
+            $status = $this
+                ->getStatusBerkasMahasiswa($item);
+
+            match ($status) {
+                'pending' => $pending++,
+                'diterima' => $diterima++,
+                'ditolak' => $ditolak++,
+            };
+        }
+
+        return [
+            'total' => $mahasiswa->count(),
+            'pending' => $pending,
+            'diterima' => $diterima,
+            'ditolak' => $ditolak,
+        ];
     }
 
     public function getProgressMahasiswa($mahasiswa): int
@@ -274,16 +296,33 @@ class VerifikatorService
         );
     }
 
-    public function getStatusMahasiswa($mahasiswa): string
+    public function getStatusBerkasMahasiswa($mahasiswa): string
     {
-        $pendaftaran = $mahasiswa
+        $berkas = $mahasiswa
             ->pendaftaran
-            ->last();
+            ->flatMap(fn($item) => $item->berkas);
 
-        if (!$pendaftaran) {
+        if ($berkas->isEmpty()) {
             return 'pending';
         }
 
-        return $pendaftaran->status ?? 'pending';
+        // jika ada yang ditolak
+        if ($berkas->contains(
+            fn($item) =>
+            $item->status_verifikasi?->value === 'ditolak'
+        )) {
+            return 'ditolak';
+        }
+
+        // jika masih ada pending
+        if ($berkas->contains(
+            fn($item) =>
+            $item->status_verifikasi?->value === 'pending'
+        )) {
+            return 'pending';
+        }
+
+        // semua diterima
+        return 'diterima';
     }
 }

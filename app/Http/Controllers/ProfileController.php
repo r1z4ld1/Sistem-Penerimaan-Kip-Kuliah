@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+//profile controller bawaan laravel breeze
 class ProfileController extends Controller
 {
     /**

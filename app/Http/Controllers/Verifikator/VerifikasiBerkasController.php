@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Verifikator;
 
 use App\Models\Berkas;
 use App\Models\Mahasiswa;
+use App\Models\Pendaftaran;
 use App\Services\VerifikatorService;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
@@ -31,6 +32,10 @@ class VerifikasiBerkasController extends Controller
             $item->progress =
                 $this->service
                 ->getProgressMahasiswa($item);
+
+            $item->status_berkas =
+                $this->service
+                ->getStatusBerkasMahasiswa($item);
         }
 
         $summary = $this->service
