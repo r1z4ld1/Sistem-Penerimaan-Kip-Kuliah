@@ -60,27 +60,63 @@
                             </td>
 
                             {{-- Status Badge --}}
-                            <td class="px-6 py-4">
-                                <span
-                                    class="{{ $item->status_verifikasi?->badge() }} px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
-                                    {{ $item->status_verifikasi?->label() ?? 'Menunggu' }}
-                                </span>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    // Ambil label status dan ubah ke huruf kecil. Jika null, gunakan 'menunggu'
+                                    $statusLabel = $item->status_verifikasi
+                                        ? strtolower($item->status_verifikasi->label())
+                                        : 'menunggu';
+                                @endphp
+
+                                @if (in_array($statusLabel, ['pending', 'menunggu']))
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        {{ ucfirst($statusLabel) }}
+                                    </span>
+                                @elseif ($statusLabel === 'diterima')
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Diterima
+                                    </span>
+                                @elseif ($statusLabel === 'ditolak')
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                        Ditolak
+                                    </span>
+                                @else
+                                    {{-- Fallback untuk status di luar yang didefinisikan --}}
+                                    <span
+                                        class="inline-flex items-center gap-1.5 bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                        {{ $item->status_verifikasi?->label() ?? 'Tidak Diketahui' }}
+                                    </span>
+                                @endif
                             </td>
 
                             {{-- Catatan --}}
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 min-w-[250px] max-w-sm">
                                 @if ($item->catatan_verifikasi)
                                     <div
-                                        class="flex items-start gap-2 bg-rose-50 text-rose-700 px-3 py-2 rounded-lg text-sm border border-rose-100/50">
-                                        <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
+                                        class="flex items-start gap-2.5 bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 shadow-sm">
+                                        {{-- Ikon Bubble Chat / Note --}}
+                                        <svg class="w-4 h-4 text-slate-400 shrink-0 mt-0.5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                                         </svg>
-                                        <span class="font-medium">{{ $item->catatan_verifikasi }}</span>
+                                        <p class="text-sm font-medium text-slate-700 leading-relaxed break-words">
+                                            {{ $item->catatan_verifikasi }}
+                                        </p>
                                     </div>
                                 @else
-                                    <span class="text-slate-300 font-medium ml-4">-</span>
+                                    {{-- Empty State Elegan --}}
+                                    <div class="flex items-center gap-2 text-slate-400 text-sm font-medium italic">
+                                        <span class="w-3 h-px bg-slate-300"></span>
+                                        Tidak ada catatan
+                                    </div>
                                 @endif
                             </td>
 
@@ -151,7 +187,8 @@
                                         </svg>
                                     </div>
                                     <h3 class="text-sm font-bold text-slate-800 mb-1">Belum Ada Berkas Diunggah</h3>
-                                    <p class="text-xs text-slate-500 mb-4">Silakan klik tombol "Upload Berkas" di atas untuk
+                                    <p class="text-xs text-slate-500 mb-4">Silakan klik tombol "Upload Berkas" di atas
+                                        untuk
                                         menambahkan dokumen persyaratan.</p>
                                 </div>
                             </td>

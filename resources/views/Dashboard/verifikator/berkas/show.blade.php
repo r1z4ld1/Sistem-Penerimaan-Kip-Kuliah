@@ -122,22 +122,64 @@
                                 </td>
 
                                 {{-- Status Saat Ini --}}
-                                <td class="px-6 py-5">
-                                    <span
-                                        class="{{ $berkas->status_verifikasi?->badge() }} inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-current/20">
-                                        {{ $berkas->status_verifikasi?->label() }}
-                                    </span>
+                                <td class="px-6 py-5 whitespace-nowrap">
+                                    @if ($berkas->status_verifikasi)
+                                        @php
+                                            $statusLabel = strtolower($berkas->status_verifikasi->label());
+                                        @endphp
+
+                                        @if ($statusLabel === 'pending')
+                                            <span
+                                                class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                Pending
+                                            </span>
+                                        @elseif ($statusLabel === 'diterima')
+                                            <span
+                                                class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                Diterima
+                                            </span>
+                                        @elseif ($statusLabel === 'ditolak')
+                                            <span
+                                                class="inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                Ditolak
+                                            </span>
+                                        @else
+                                            {{-- Fallback jika ada nama status lain di luar 3 kategori utama --}}
+                                            <span
+                                                class="inline-flex items-center gap-1.5 bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                                {{ $berkas->status_verifikasi->label() }}
+                                            </span>
+                                        @endif
+                                    @else
+                                        <span class="text-xs text-slate-400 font-medium">Belum Diisi</span>
+                                    @endif
                                 </td>
 
-                                {{-- Catatan (Current) --}}
-                                <td class="px-6 py-5">
+                                {{-- Catatan Verifikasi --}}
+                                <td class="px-6 py-5 min-w-[250px] max-w-sm">
                                     @if ($berkas->catatan_verifikasi)
-                                        <p
-                                            class="text-sm text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                                            {{ $berkas->catatan_verifikasi }}
-                                        </p>
+                                        <div
+                                            class="flex items-start gap-2.5 bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 shadow-sm">
+                                            {{-- Ikon Bubble Chat / Note --}}
+                                            <svg class="w-4 h-4 text-slate-400 shrink-0 mt-0.5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                            </svg>
+                                            <p class="text-sm text-slate-700 leading-relaxed break-words">
+                                                {{ $berkas->catatan_verifikasi }}
+                                            </p>
+                                        </div>
                                     @else
-                                        <span class="text-slate-400 text-sm italic">-</span>
+                                        {{-- Empty State --}}
+                                        <div class="flex items-center gap-2 text-slate-400 text-sm font-medium italic">
+                                            <span class="w-3 h-px bg-slate-300"></span>
+                                            Tidak ada catatan
+                                        </div>
                                     @endif
                                 </td>
 
@@ -175,7 +217,8 @@
                                         {{-- Tombol Submit --}}
                                         <button type="submit"
                                             class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-sm shadow-blue-500/30 transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7" />
                                             </svg>
